@@ -78,3 +78,80 @@ M$p.value
 # the first group and that of the second is -5 is specified as follows:
 t.test(score ~ group, data = data_df, mu = -5, var.equal = TRUE)
 
+
+# Confidence intervals ----------------------------------------------------
+
+# What is a confidence interval? For the t-test like problem, the 95% confidence
+# interval is the range of hypothetical values that we would not reject at the
+# 0.05 level of significance were we to test them in a hypothesis test.
+
+# The 95% confidence interval for the problem above is above as follows:
+M$conf.int
+
+# If we were to test the hypothesis that the true value of the difference between the population
+# means of the two groups is any value in the interval, we would obtain a p-value > 0.05.
+
+# By the way, we wanted the e.g. 99% confidence interval for this t.test
+# problem, we could do the following:
+t.test(score ~ group, data = data_df, var.equal = TRUE, conf.level = 0.99)
+
+# Where do we calculate the confidence interval manually?
+# For reasons explained in the lecture, the confidence interval is calculate by
+# some multiple of the standard error above and below the difference of the 
+# same means.
+# The multiple is based on areas under the curve in t-distributions.
+# In particular, it is the value `x` such that (-x, x) contains 95% of the 
+# area under a curve in a given t-distribution.
+# We can obtain this value using the inverse cumulative distribution function 
+# of the t-distribution, which is `qt`.
+# The `qt` function tells us the value below which lies a given percentage 
+# of the area under the curve in t-distribution.
+
+# For example, the value below which lies 75% of the area under the curve
+# in  a t-distribution with 10 degrees of freedom is as follows:
+qt(0.75, df = 10)
+
+
+# For example, the value below which lies 25% of the area under the curve
+# in  a t-distribution with 20 degrees of freedom is as follows:
+qt(0.25, df = 20)
+
+
+# For example, the value below which lies 33% of the area under the curve
+# in  a t-distribution with 17 degrees of freedom is as follows:
+qt(0.33, df = 17)
+
+# As stated above, we need to know the values between which lies 95% of the area under the 
+# curve in a t-distribution. We get this with qt(0.975, df = ...).
+# For example, the following tells us the value below which lies 95% of the area
+# under the curve in a 10 df t-distribution:
+qt(0.975, df = 10)
+
+# From this, we know that 95% (not a typo) of the area under the curve lies between
+# -2.228 and +2.228. It is therefore this quantity of 2.228 that we would use
+# when calculating confidence intervals in 10 df t-distributions.
+
+# Why do we do qt(0.975, ...) to get the 95% confidence interval?
+# Because if 97.5% of the area under the curve lies below say 2.228, then 2.5%
+# is above 2.228, and 2.5% is below -2.228.
+
+# So, finally, to get the 95% confidence interval manually, we get the standard
+# error and we multiply the standard error by the value we get from qt(0.975, ...).
+# Then we add and subtract that from the differences in the sample means.
+
+# Do this using the model `M` above.
+
+# differences in sample means
+mean_diff <- M$estimate['mean in group group_0'] - M$estimate['mean in group group_1']
+
+# standard error 
+se <- M$stderr
+
+# the value from qt(0.975, ...), which we will call the `t_multiplier`
+t_multiplier <- qt(0.975, df = M$parameter)
+
+# now, we subtract and add se x t_multiplier to the differences in means
+c(mean_diff - se * t_multiplier, mean_diff + se * t_multiplier)
+
+# And we can see that is the same as the reported 95% confidence interval
+M$conf.int
