@@ -1,5 +1,5 @@
 ---
-title: "More on TSS, ESS, RSS"
+title: "On $\textrm{TSS}$, $\textrm{ESS}$, $\textrm{RSS}$, and $R^2$"
 date: "October 23, 2021"
 ---
 
@@ -13,7 +13,7 @@ $$
 $$
 to verify that it is equal to $R^2$.
 
-The definitions of $\textrm{TSS}$, $\textrm{TSS}$, and $\textrm{TSS}$ are in the following equation:
+The definitions of $\textrm{TSS}$, $\textrm{ESS}$, and $\textrm{RSS}$ are in the following equation:
 $$
 \underbrace{\sum_{i=1}^n (y_i-\bar{y})^2}_{\text{TSS}} = \underbrace{\sum_{i=1}^n (\hat{y}_i - \bar{y})^2}_{\text{ESS}} + \underbrace{\sum_{i=1}^n (y_i - \hat{y}_i)^2}_{\text{RSS}}.
 $$
