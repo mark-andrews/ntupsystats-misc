@@ -1,5 +1,5 @@
 ---
-title: "On $\textrm{TSS}$, $\textrm{ESS}$, $\textrm{RSS}$, and $R^2$"
+title: "On $\\textrm{TSS}$, $\\textrm{ESS}$, $\\textrm{RSS}$, and $R^2$"
 date: "October 23, 2021"
 ---
 
