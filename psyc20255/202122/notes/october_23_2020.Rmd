@@ -1,0 +1,38 @@
+---
+title: "More on TSS, ESS, RSS"
+date: "October 23, 2021"
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+```
+
+In the following, we do a multiple linear regression, and then calculate
+$$
+\frac{\textrm{ESS}}{\textrm{TSS}}
+$$
+to verify that it is equal to $R^2$.
+
+The definitions of $\textrm{TSS}$, $\textrm{TSS}$, and $\textrm{TSS}$ are in the following equation:
+$$
+\underbrace{\sum_{i=1}^n (y_i-\bar{y})^2}_{\text{TSS}} = \underbrace{\sum_{i=1}^n (\hat{y}_i - \bar{y})^2}_{\text{ESS}} + \underbrace{\sum_{i=1}^n (y_i - \hat{y}_i)^2}_{\text{RSS}}.
+$$
+
+```{r}
+library(psyntur)
+
+M <- lm(weight ~ height + age, data = ansur)
+
+y <- ansur[['weight']] # observed values of outcome variable
+y_hat <- predict(M)    # predicted values of the outcome variable
+y_bar <- mean(y)       # mean of observed values of outcome variable
+
+TSS <- sum((y-y_bar)^2)
+ESS <- sum((y_hat - y_bar)^2)
+RSS <- sum((y - y_hat)^2)
+
+ESS / TSS
+
+summary(M)$r.squared
+```
+
