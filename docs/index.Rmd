@@ -1,0 +1,17 @@
+---
+title: "Miscellaneous notes"
+author: "Mark Andrews"
+---
+
+```{r, echo =FALSE, message=FALSE, warning=FALSE, results='asis'}
+library(fs)
+library(purrr)
+library(here)
+
+rmd_files <- dir_ls(recurse = TRUE, glob = '*.html')
+rmd_files <- Filter(function(x) {!('index.html' %in% x)}, rmd_files)
+cat('<ul>')
+cat(paste0('<li><a href="', rmd_files, '">', rmd_files, '</li>'))
+cat('</ul>')
+```
+
