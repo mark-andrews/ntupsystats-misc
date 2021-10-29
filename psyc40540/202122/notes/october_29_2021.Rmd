@@ -1,0 +1,79 @@
+---
+title: "t-tests done the `t.test` way and the manual way"
+---
+
+```{r, echo=FALSE}
+options(scipen=99999)
+```
+
+Here's a simple t-test, where we assume equal variances.
+
+```{r}
+x <- c(179.6, 171.6, 174.1, 175.1, 174.9, 171.3, 177.2, 171.6, 174.5)
+y <- c(162.8, 165.5, 161.8, 168.9, 166.8, 165.5, 167.2)
+
+t_test_result <- t.test(x, y, var.equal = TRUE)
+
+t_test_result
+```
+
+From this, we can see the t statistics, the p-value etc.
+We can also pull them out from the `t_test_result` object as follows:
+```{r}
+t_test_result$statistic # t-statistic
+t_test_result$p.value   # p-value
+t_test_result$stderr    # standard error
+```
+
+Now, let us check all of this by doing it out the long way.
+```{r}
+x_bar <- mean(x) # Calculate means
+y_bar <- mean(y)
+
+n_x <- length(x) # Calculate sample sizes
+n_y <- length(y)
+
+s2_x <- var(x) # Calculate variances
+s2_y <- var(y)
+
+# Calculate standard error 
+Sp <- sqrt( ((n_x - 1) * s2_x + (n_y - 1) * s2_y)/(n_x + n_y - 2))
+se <- Sp * sqrt(1/n_x + 1/n_y)
+```
+
+So, so far, we have the differences of the means as follows:
+```{r}
+x_bar - y_bar
+```
+And the standard error is 
+```{r}
+se
+```
+And so the t-statistic is
+```{r}
+# t-statistic 
+t_stat <- (x_bar - y_bar)/se
+t_stat
+```
+
+So, so far, so good, and all in line with the `t.test` result above.
+
+Now, we use the cumulative distribution function `pt` to find the probability of a values as or more extreme than `r t_stat` in a t-distribution with `r n_x + n_y - 2` degrees of freedom.
+
+```{r}
+# Probability of value lower than minus t_stat
+pt(-t_stat, n_x + n_y - 2)
+
+# Probability of value greater than t_stat
+pt(t_stat, n_x + n_y - 2, lower.tail = F) 
+```
+```{r echo=T}
+# The p-value is defined as the probability
+# of a result as or more extreme than the
+# observed statistic ...
+p_value <- pt(-t_stat, n_x + n_y - 2) + 
+           pt(t_stat, n_x + n_y -2 , lower.tail = F)
+
+p_value
+```
+
