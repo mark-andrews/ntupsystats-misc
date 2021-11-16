@@ -1,0 +1,33 @@
+---
+title: "Using `knitr::kable` for model comparison tables"
+---
+
+```{r, echo=FALSE}
+options(scipen=99999)
+```
+
+
+First, we will do a F test based comparison of normal linear models.
+```{r}
+M1 <- lm(mpg ~ cyl + disp + hp + drat, data = mtcars)
+M2 <- lm(mpg ~ cyl + disp, data = mtcars)
+result <- anova(M1, M2)
+```
+
+We can use `knitr::kable` to display this, but we get `NA`'s.
+```{r}
+knitr::kable(result)
+```
+
+Do this to make the `NA`'s go away:
+```{r}
+options(knitr.kable.NA = '')
+knitr::kable(result)
+```
+
+Better yet, use lower number of decimal places.
+```{r}
+knitr::kable(result, digits = 2)
+```
+
+
