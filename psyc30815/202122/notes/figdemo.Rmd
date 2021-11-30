@@ -1,0 +1,24 @@
+---
+title: "We Love/Hate Floating Figures"
+author: "Mark Andrews"
+date: "29/11/2021"
+output: 
+  pdf_document:
+    keep_tex: true
+    includes:
+      in_header: "header.tex"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE,fig.pos = "H", out.extra = "")
+```
+
+```{r}
+library(tidyverse)
+```
+
+```{r foofigure, fig.cap="This is a floating figure right?", fig.align='center'}
+ggplot(cars, aes(speed, dist)) + geom_line()
+```
+
+As you can see in Figure \ref{fig:foofigure}.
