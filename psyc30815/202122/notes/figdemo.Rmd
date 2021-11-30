@@ -1,5 +1,5 @@
 ---
-title: "We Love/Hate Floating Figures"
+title: "We Love/Hate Floating Figures/Tables"
 author: "Mark Andrews"
 date: "29/11/2021"
 output: 
@@ -22,3 +22,20 @@ ggplot(cars, aes(speed, dist)) + geom_line()
 ```
 
 As you can see in Figure \ref{fig:foofigure}.
+
+# A table
+
+```{r}
+M <- lm(dist ~ speed, data = cars)
+coef_table <- summary(M)$coefficients
+```
+
+```{r footable, echo = FALSE}
+knitr::kable(coef_table, digits = 2,
+             caption = 'Coefficients for a linear model of car stopping times',
+             format = 'latex',
+             booktabs = TRUE) %>% 
+  kableExtra::kable_styling(latex_options = 'hold_position')
+```
+
+Table \ref{tab:footable} shows some important results.
