@@ -1,0 +1,136 @@
+---
+title: "Analysis of Randomized Control Trial Intervention"
+author: "Mark Andrews"
+output: 
+  html_document:
+    toc: true
+editor_options:
+  chunk_output_type: console
+---
+
+```{r, echo=F}
+knitr::opts_chunk$set(warning = FALSE, message = FALSE)
+```
+
+What is presented here is how to do an analysis of an intervention study that has baseline and followup scores and two alternative treatments, which could be a treatment and a control.
+This note is *not* a model results section.
+It is just a how-to for doing some of the main analyses using R.
+
+# Load necessary packages
+
+```{r}
+library(tidyverse) # for general data manipulations
+library(psyntur) # for visualization and descriptives
+```
+
+# Read in the data
+
+For this example, we will use a data file named `anorexia4.csv` that gives the results of an anorexia treatment intervention study. There were two treatments being compared. They were `CBT`, cognitive behavioural therapy, and `FT`, family therapy. Even though there is no control here, it does not make any difference in terms of nature of the analysis.
+
+```{r}
+anorexia_df <- read_csv("http://data.ntupsychology.net/anorexia4.csv")
+```
+First thing to do, as always, is to look at the data:
+```{r}
+anorexia_df
+```
+
+We see that we have `r nrow(anorexia_df)` rows of data. Each row respresents a person. For each person, we have the treatment condition they were in (`Treat`), their body weight (in lbs) at baseline (`Prewt`), and their body weight at follow up (`Postwt`). The greater the average weight gain, the more effective the treatment.
+
+# Exploratory analysis
+
+Let us now look at some measures of central tendency and dispersion for the baseline and followup weights in the two groups.
+```{r}
+describe_across(anorexia_df,
+                variables = c(Prewt, Postwt),
+                functions = c(median = median,
+                              mean = mean,
+                              mad = mad,
+                              sd = sd),
+                by = Treat,
+                pivot = TRUE)
+```
+We can see that there is a greater increase in weight from baseline to followup in the family therapy (`FT`) condition. The measures of dispersion, when measured by `mad`, are roughly similar at baseline and followup in the two treatments. We see more variability at followup in the two treatments when we use the standard deviation. Standard deviation is (much) more sensitive to extreme values than `mad`, and so we should expect some extreme values, particularly at followup. This should be apparent in visualizations.
+
+For each individual, we can calculate the difference, which we will name `change`, between their followup and baselines scores. This gives their weight gain.
+```{r}
+anorexia_df2 <- mutate(anorexia_df, change = Postwt - Prewt)
+anorexia_df2
+```
+As we can see, we now have a new column named `change` that gives each individual's weight gain.
+We can do a table similar to that above for these change scores:
+```{r}
+describe_across(anorexia_df2,
+                variables = change,
+                functions = c(median = median,
+                              mean = mean,
+                              mad = mad,
+                              sd = sd),
+                by = Treat,
+                pivot = TRUE)
+```
+Here, it is clear that their has been a large weight gain on average in the `FT` condition than in the `CBT` condition.
+
+# Visualization
+
+First, we will do a boxplot of the `Prewt` and `Postwt` scores in both conditions.
+To do this plot, we must first reshape the data set. We do this with `pivot_longer`.
+```{r}
+anorexia_df3 <- pivot_longer(anorexia_df,
+                             cols = -Treat,
+                             names_to = 'when',
+                             values_to = 'weight')
+
+# make boxplot with `anorexia_df3` rather than `anorexia_df`
+tukeyboxplot(data = anorexia_df3,
+             y = weight, 
+             x = Treat, 
+             by = when, 
+             jitter = TRUE)
+```
+
+We see that the baseline scores are quite similar in `FT` and `CBT`, but followup scores are higher in the `FT` condition. There are some extreme values in the followup scores in the `FT` condition.
+
+We can also look at boxplots of the change scores.
+For this, we use `anorexia_df2`, i.e. with the `change` variable. We do not need to reshape this data.
+```{r}
+tukeyboxplot(y = change, x = Treat, data = anorexia_df2, jitter = TRUE)
+```
+
+In this plot, it is evident that there is more weight gain in the `FT` condition. We also see some extreme change score values in the `CBT` condition.
+
+Another plot that we can do is a scatterplot.
+```{r}
+scatterplot(x = Prewt, 
+            y = Postwt, 
+            data = anorexia_df, 
+            by = Treat, best_fit_line = TRUE)
+```
+
+This plot shows that there is a correlation between the baseline and followup scores in both treatments.
+Most importantly, we see that for any given value of the baseline, the expected value of the followup is higher in the `FT` than the `CBT` condition.
+
+# Analysis of Covariance
+
+Applied to this problem, the analysis of covariance analyses whether there is a difference in followup scores between the two treatments assuming there are no differences at baseline.
+It is very easy to do.
+```{r}
+M <- lm(Postwt ~ Treat + Prewt, data = anorexia_df)
+summary(M)
+```
+This result tells us that if the baseline scores are the same across the two groups, those in the `FT` group gain on average `r round(coef(M)[2], 4)` more than those in the `CBT` group.
+In other words, `r round(coef(M)[2], 4)` is the difference in the average weight gain across the two groups, assuming that the baseline scores are the same.
+This difference is marginally significant: $t(\text{df} = `r M$df.residual`) = `r round(summary(M)$coefficients[2,3], 3)`$, $\mathrm{p} = `r round(summary(M)$coefficients[2,4], 4)`$.
+
+```{r, echo=F}
+car::Anova(M) -> ff
+```
+
+
+
+We can obtain an equivalent statistical test results as follows, which is the more common way of reporting the ancova results, and in fact, it is necessary to do it this way if you have more than two groups:
+```{r}
+car::Anova(M)
+```
+Here, the difference in `Postwt` due to the treatment condition, assuming that there are no differences in `Prewt`, is given by the F statistic result reported in the `Treat` row, i.e. $F(`r ff$Df[1]`, `r ff$Df[3]`)$ = $`r round(ff[[3]][1], 2)`$, $\mathrm{p} = `r round(ff[[4]][1], 4)`$.
+
