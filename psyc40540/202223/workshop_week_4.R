@@ -49,3 +49,6 @@ TQ <- qt(0.975, df = 38)
 (xbar - ybar) + TQ * se
 (xbar - ybar) - TQ * se
 
+# the lower and upper bounds can be calculated in one line as follows:
+(xbar - ybar) + c(-1, 1) * TQ * se
+
