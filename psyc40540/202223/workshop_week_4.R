@@ -34,7 +34,7 @@ s_y <- sd(y) # stdev of y
 n_x <- length(x) # sample size of x 
 n_y <- length(y) # sample size of y
 
-# standard error
+# calculate standard error
 
 term_1_numerator <- (n_x - 1) * s_x^2 + (n_y - 1) * s_y^2
 term_1_denominator <- n_x + n_y - 2
@@ -43,7 +43,9 @@ term_1 <- sqrt(term_1_numerator / term_1_denominator)
 term_2 <- sqrt(1/n_x + 1/n_y)
 se <- term_1 * term_2
 
+# calculate 95% confidence interval from se
 
 TQ <- qt(0.975, df = 38)
 (xbar - ybar) + TQ * se
 (xbar - ybar) - TQ * se
+
