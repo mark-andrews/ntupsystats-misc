@@ -47,3 +47,30 @@ ggplot(sleepstudy,
   geom_abline(intercept = coef(M_8_1)[1],
               slope = coef(M_8_1)[2]) +
   facet_wrap(~Subject)
+
+
+
+# No pooling model analysis -----------------------------------------------
+
+M_8_2 <- lm(Reaction ~ Days * Subject, data = sleepstudy)
+M_8_2b <- lm(Reaction ~ Days + Subject + Days:Subject, data = sleepstudy)
+M_8_2c <- lm(Reaction ~ 0 + Subject + Days:Subject, data = sleepstudy)
+
+library(modelr)
+add_predictions(sleepstudy, M_8_2c) %>% 
+  ggplot(aes(x = Days, y = Reaction)) +
+  geom_point() +
+  geom_line(aes(y = pred)) +
+  facet_wrap(~Subject)
+
+summary(M_8_2)$r.sq # look at R^2
+# compare to the pooled model
+summary(M_8_1)$r.sq
+
+
+
+# Multilevel model --------------------------------------------------------
+
+library(lme4)
+M_8_3 <- lmer(Reaction ~ Days + (Days|Subject), data = sleepstudy)
+summary(M_8_3)
