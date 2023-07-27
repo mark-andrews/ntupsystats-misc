@@ -71,3 +71,12 @@ M_9_7 <- lmer(mathscore ~ ses + (ses|schoolid) + (ses||classid),
 
 M_9_8 <- lmer(mathscore ~ ses + (ses|schoolid) + (1|classid), 
               data = classroom_df)
+
+# Crossed structures ------------------------------------------------------
+
+blp_df <- mutate(blp_df, freq = scale(freq)[,1])
+
+M_9_9 <- lmer(log(rt) ~ freq + (freq|participant) + (1|spelling),
+              data = blp_df)
+
+summary(M_9_9)     
