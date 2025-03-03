@@ -7,7 +7,7 @@ library(lavaanPlot)  # plotting of sem model
 
 
 # load up some data
-lupien_df <- read_csv("http://data.ntupsychology.net/lupien22.csv")
+lupien_df <- read_csv("https://raw.githubusercontent.com/mark-andrews/ntupsychology-data/main/data-sets/lupien22.csv")
 
 # pairwise correlations
 cor(lupien_df, use = 'complete.obs')
